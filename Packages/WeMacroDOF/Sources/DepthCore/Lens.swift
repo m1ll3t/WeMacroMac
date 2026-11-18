@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 m1ll3t
+
 import Foundation
 public enum MacroLens: String, CaseIterable, Sendable {
     case macro = "微距镜头"

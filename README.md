@@ -6,7 +6,7 @@
 
 ## 下载
 
-[下载 1.1 预发布版](https://github.com/m1ll3t/WeMacroMac/releases/tag/v1.1.0-beta.1) · [查看全部版本](https://github.com/m1ll3t/WeMacroMac/releases)
+[下载 1.1 预发布版](https://github.com/m1ll3t/WeMacroMac/releases/tag/v1.1.0-beta.2) · [查看全部版本](https://github.com/m1ll3t/WeMacroMac/releases)
 
 解压下载的 ZIP 后打开应用。
 
@@ -80,3 +80,9 @@
 - `Resources`：应用图标。
 
 反馈问题请附系统版本、应用版本、设备型号及复现步骤。公开通信日志前请检查设备名称等个人信息。
+
+## 开源许可证
+
+Copyright © 2026 m1ll3t。本项目采用 **GNU General Public License v3.0（GPL-3.0-only）**，完整条款见 [LICENSE](LICENSE)。此声明也适用于本仓库中的内置 `DepthCore` 计算模块。
+
+允许使用、修改、分发及商用。分发受 GPL 约束的修改版或应用包时，应遵守 GPLv3 并向接收者提供相应源码及许可声明。本项目不提供任何担保。

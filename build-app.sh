@@ -1,4 +1,6 @@
 #!/bin/zsh
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 m1ll3t
 set -euo pipefail
 cd "${0:A:h}"
 export CLANG_MODULE_CACHE_PATH=/tmp/wemacro-clang
@@ -6,6 +8,14 @@ swift build --disable-sandbox -c release --scratch-path .build
 app="$PWD/dist/WeMacro 1.1.app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 cp .build/release/WeMacroMac "$app/Contents/MacOS/WeMacroMac"
+cp LICENSE "$app/Contents/Resources/LICENSE.txt"
+cp NOTICE "$app/Contents/Resources/NOTICE.txt"
+cat > "$app/Contents/Resources/SOURCE.txt" <<'SOURCE'
+WeMacroMac is licensed under GPL-3.0-only.
+Corresponding source and build instructions for this distribution:
+https://github.com/m1ll3t/WeMacroMac/tree/v1.1.0-beta.2
+https://github.com/m1ll3t/WeMacroMac/releases/download/v1.1.0-beta.2/WeMacro-1.1-source.zip
+SOURCE
 iconset="$(mktemp -d)/AppIcon.iconset"
 mkdir -p "$iconset"
 icon_png="$PWD/Resources/AppIcon.png"
@@ -28,8 +38,9 @@ cat > "$app/Contents/Info.plist" <<'PLIST'
 <key>CFBundlePackageType</key><string>APPL</string>
 <key>CFBundleIconFile</key><string>AppIcon</string>
 <key>CFBundleShortVersionString</key><string>1.1.0</string>
-<key>CFBundleVersion</key><string>110</string>
+<key>CFBundleVersion</key><string>111</string>
 <key>LSMinimumSystemVersion</key><string>14.0</string>
+<key>NSHumanReadableCopyright</key><string>Copyright © 2026 m1ll3t. GPL-3.0-only.</string>
 <key>NSHighResolutionCapable</key><true/>
 <key>NSBluetoothAlwaysUsageDescription</key><string>连接 WeMacro HC-08 控制器，控制滑轨移动和相机快门。</string>
 </dict></plist>

@@ -1,4 +1,6 @@
 #!/bin/zsh
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (C) 2026 m1ll3t
 set -euo pipefail
 root="${0:A:h:h}"
 args=(--disable-sandbox)

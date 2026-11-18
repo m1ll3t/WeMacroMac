@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 m1ll3t
+
 import Testing
 import Foundation
 @testable import WeMacroMac

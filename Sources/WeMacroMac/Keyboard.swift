@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-only
+// Copyright (C) 2026 m1ll3t
+
 import AppKit
 
 /// Local to this application; no global keyboard or Accessibility permission.
