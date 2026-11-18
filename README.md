@@ -10,6 +10,12 @@
 
 解压下载的 ZIP 后打开应用。
 
+## 界面截图
+
+| 主界面 | 步长计算器 | 设置 |
+| --- | --- | --- |
+| ![主界面](docs/screenshots/main.png) | ![步长计算器](docs/screenshots/calculator.png) | ![设置](docs/screenshots/settings.png) |
+
 ## 系统与版本
 
 - macOS 14+；当前应用包为 Apple Silicon 版本。
