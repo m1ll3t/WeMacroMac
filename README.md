@@ -2,6 +2,8 @@
 
 使用 Swift / SwiftUI / AppKit 开发的原生 macOS 电动滑轨控制程序，内置景深与步长计算器。独立开发的第三方应用，与 WeMacro 官方没有隶属关系。
 
+本项目使用 OpenAI Codex 开发。
+
 ## 下载
 
 [下载 1.1 预发布版](https://github.com/m1ll3t/WeMacroMac/releases/tag/v1.1.0-beta.1) · [查看全部版本](https://github.com/m1ll3t/WeMacroMac/releases)
