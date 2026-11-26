@@ -7,8 +7,8 @@ import DepthCore
     let r = try DepthCalculator.calculate(.init())
     #expect(abs(r.depthMicrons - 8.512) < 0.00001)
     #expect(abs(r.sampling - 3.48) < 0.00001)
-    #expect(abs(r.stepMicrons - 5.9584) < 0.00001)
-    #expect(r.quantizedStepMicrons == 5.9375)
+    #expect(abs(r.stepMicrons - 6.8096) < 0.00001)
+    #expect(r.quantizedStepMicrons == 6.5625)
     let other = try DepthCalculator.calculate(.init(na: 0.5, magnification: 20))
     #expect(abs(other.depthMicrons - 2.128) < 0.00001)
     #expect(abs(other.sampling - 3.48) < 0.00001)
@@ -125,4 +125,11 @@ import DepthCore
     let result = try DepthCalculator.calculateForLens(.init(na: na, magnification: 1, pixelSize: 3.76, overlap: 0.2), lens: .macro, aperture: 2.8)
     #expect(abs(result.depthMicrons - 201.6) < 0.000001)
     #expect(abs(result.stepMicrons - 161.28) < 0.000001)
+}
+
+@Test func defaultOverlapIsTwentyPercentForEveryLens() {
+    #expect(DepthInput().overlap == 0.2)
+    for lens in MacroLens.allCases {
+        #expect(LensParameters(lens:lens).input.overlap == 0.2)
+    }
 }

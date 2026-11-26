@@ -106,8 +106,7 @@ struct ContentView: View {
         .frame(width:630,height:822,alignment:.top).ignoresSafeArea(.container,edges:.top)
         .background(RailPalette.background).preferredColorScheme(.light).font(.system(size:14))
         .buttonStyle(PressedOverlayStyle(bordered:true))
-        .environment(\.railButtonAction, {m.resetCaptureCompletion()})
-        .onChange(of:m.settings){m.resetCaptureCompletion();m.saveDefaults()}
+        .onChange(of:m.settings){m.saveDefaults()}
         .onChange(of:ui.panel){m.controlsBlocked = ui.panel != nil}
         .onChange(of:m.calculatorRequest){openPanel("calculator")}
         .onChange(of:link.devices){_,devices in
@@ -266,7 +265,7 @@ struct ContentView: View {
                     }
                     Spacer(minLength:8)
                     let showingStop = m.busy && m.capturing
-                    Button{NSApp.keyWindow?.makeFirstResponder(nil);if showingStop {m.stop()}else if !m.busy && !m.captureFinished {m.run()}}label:{Label(showingStop ? "停止":m.captureFinished ? "已完成":"运行",systemImage:showingStop ? "stop.fill":m.captureFinished ? "checkmark":"camera.fill").font(.system(size:17,weight:.semibold)).foregroundStyle(.white).frame(width:153,height:36).background(showingStop ? Color.red:m.captureFinished ? Color.green:Color.blue,in:RoundedRectangle(cornerRadius:9))}.buttonStyle(PressedOverlayStyle(dimDisabled:!m.canRun && !m.captureFinished,resetsCompletion:false)).disabled(!showingStop && !m.captureFinished && !m.canRun)
+                    Button{NSApp.keyWindow?.makeFirstResponder(nil);if showingStop {m.stop()}else if !m.busy && !m.captureFinished {m.run()}}label:{Label(showingStop ? "停止":m.captureFinished ? "已完成":"运行",systemImage:showingStop ? "stop.fill":m.captureFinished ? "checkmark":"camera.fill").font(.system(size:17,weight:.semibold)).foregroundStyle(.white).frame(width:153,height:36).background(showingStop ? Color.red:m.captureFinished ? Color.green:Color.blue,in:RoundedRectangle(cornerRadius:9))}.buttonStyle(PressedOverlayStyle(dimDisabled:!m.canRun && !m.captureFinished)).disabled(!showingStop && !m.captureFinished && !m.canRun)
                 }
             }.padding(23).frame(maxWidth:.infinity,maxHeight:.infinity)
         }

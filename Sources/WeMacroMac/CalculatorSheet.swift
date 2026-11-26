@@ -84,6 +84,13 @@ struct CalculatorSheet:View {
         if model.lens == .manual && (!(1...50).contains(model.input.magnification) || !(0.01...0.99).contains(model.input.na)){return nil}
         return try? DepthCalculator.calculateForLens(model.input,lens:model.lens,aperture:model.aperture)
     }
+    private var currentStepMicrons:Double? {
+        result?.stepMicrons
+    }
+    private var canUseCurrentStep:Bool {
+        guard canApply, let step=currentStepMicrons, step.isFinite else { return false }
+        return step >= 1 && step <= 100_000
+    }
     private var parameterError:String {
         if model.lens == .manual && model.input.na>=1 {return "NA值不能大于等于1"}
         if model.lens == .aksen45 && !model.lens.range.contains(model.input.magnification){return "放大倍率请设置为1-5倍"}
@@ -112,7 +119,7 @@ struct CalculatorSheet:View {
                 HStack {
                     Button(action:close){Text("返回").frame(width:84,height:32).background(.white,in:RoundedRectangle(cornerRadius:6)).overlay(RoundedRectangle(cornerRadius:6).stroke(Color.black.opacity(0.20)).allowsHitTesting(false))}.buttonStyle(PressedOverlayStyle())
                     Spacer()
-                    Button{NSApp.keyWindow?.makeFirstResponder(nil);if canApply, let r=result, r.stepMicrons>0, r.stepMicrons<=100_000 {apply(r.stepMicrons)}}label:{Text("使用当前步长").fontWeight(.semibold).foregroundStyle(.white).frame(width:124,height:32).background(.blue,in:RoundedRectangle(cornerRadius:8))}.buttonStyle(PressedOverlayStyle()).disabled(result==nil || !canApply)
+                    Button{NSApp.keyWindow?.makeFirstResponder(nil);if canUseCurrentStep, let step=currentStepMicrons {apply(step)}}label:{Text("使用当前步长").fontWeight(.semibold).foregroundStyle(.white).frame(width:124,height:32).background(.blue,in:RoundedRectangle(cornerRadius:8))}.buttonStyle(PressedOverlayStyle()).disabled(!canUseCurrentStep)
                 }.padding(.top,19)
             }.padding(.horizontal,24).padding(.vertical,18)
         }
@@ -161,7 +168,10 @@ struct CalculatorSheet:View {
     var resultCard:some View {
         RailCard {VStack(spacing:14){
             if let r=result {
-                HStack(spacing:16){metric("景深",value:r.depthMicrons,detail:String(format:"≈ %.3f mm",r.depthMicrons/1000),color:.primary);metric("步长",value:r.stepMicrons,detail:String(format:"重叠 %.0f%%",model.input.overlap*100),color:Color(red:0,green:0.4,blue:0.81))}
+                HStack(alignment:.top,spacing:16){
+                    metric("景深",value:r.depthMicrons,detail:String(format:"≈ %.3f mm",r.depthMicrons/1000),color:.primary)
+                    metric("建议步长",value:r.stepMicrons,detail:String(format:"重叠 %.0f%%",model.input.overlap*100),color:Color(red:0,green:0.4,blue:0.81))
+                }
                 Divider()
                 HStack(spacing:10){Text(r.samplingState).font(.system(size:13,weight:.semibold)).foregroundStyle(samplingColor(r)).padding(.horizontal,9).padding(.vertical,5).background(samplingColor(r).opacity(0.12),in:RoundedRectangle(cornerRadius:5));Spacer();Text(r.sampling<2.3 ? "未充分利用镜头分辨率":r.sampling>3.5 ? "无效放大，并不会更清晰":"倍率与镜头分辨率匹配").font(.system(size:13)).foregroundStyle(.secondary)}
             }else{Label(parameterError,systemImage:"exclamationmark.circle").foregroundStyle(.secondary).frame(maxWidth:.infinity,minHeight:100)}
@@ -169,12 +179,12 @@ struct CalculatorSheet:View {
     }
     func samplingColor(_ r:DepthResult)->Color{r.sampling<2.3 ? .red:r.sampling<=3.5 ? .green:.blue}
     func metric(_ title:String,value:Double,detail:String,color:Color)->some View {
-        let isStep = title == "步长"
+        let isStep = title == "建议步长"
         let displayed = isStep ? (value <= 1000 ? floor(value) : floor(value / 100) / 10) : value
         let unit = isStep && value > 1000 ? "mm" : "µm"
         let shown = isStep && value > 1000 ? displayed : displayed
         let precision = isStep ? (value > 1000 ? 1 : 0) : (value >= 100 ? 1 : value >= 10 ? 2 : 3)
-        return VStack(alignment:.leading,spacing:7){Text(title).font(.system(size:13,weight:.semibold)).foregroundStyle(.secondary);HStack(alignment:.firstTextBaseline,spacing:5){Text(shown.formatted(.number.precision(.fractionLength(precision)))).font(.system(size:32,weight:.semibold)).foregroundStyle(color).lineLimit(1).minimumScaleFactor(0.6);Text(unit).font(.system(size:15)).foregroundStyle(.secondary)};Text(detail).font(.system(size:12)).foregroundStyle(.secondary)}.frame(maxWidth:.infinity,alignment:.leading)
+        return VStack(alignment:.leading,spacing:7){Text(title).font(.system(size:13,weight:.semibold)).foregroundStyle(.secondary);HStack(alignment:.firstTextBaseline,spacing:5){Text(shown.formatted(.number.precision(.fractionLength(precision)))).font(.system(size:32,weight:.semibold)).foregroundStyle(color).lineLimit(1).minimumScaleFactor(0.6);Text(unit).font(.system(size:15)).foregroundStyle(.secondary)};Text(detail).font(.system(size:12)).foregroundStyle(.secondary)}.frame(minWidth:0,maxWidth:.infinity,alignment:.leading)
     }
     func adjustOverlap(_ direction:Int){NSApp.keyWindow?.makeFirstResponder(nil);let p=(model.input.overlap*100_000).rounded()/1000;model.input.overlap=min(95,max(0,direction>0 ? (floor(p/5)+1)*5:(ceil(p/5)-1)*5))/100}
     func adjustManual(na:Bool,direction:Int){NSApp.keyWindow?.makeFirstResponder(nil);if na{model.input.na=min(0.99,max(0.01,((model.input.na+Double(direction)*0.01)*100).rounded()/100))}else{model.input.magnification=min(50,max(1,model.input.magnification+Double(direction)))}}

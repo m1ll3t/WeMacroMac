@@ -153,7 +153,6 @@ import UniformTypeIdentifiers
     func perform(_ action: @escaping @MainActor () async throws -> Void) {
         guard !busy, link.connected else { return }
         do { try settings.validate() } catch { self.error = error.localizedDescription; return }
-        resetCaptureCompletion()
         busy = true; paused = false
         let id = UUID(); token = id
         sleepAssertion = ProcessInfo.processInfo.beginActivity(options: [.userInitiated, .idleSystemSleepDisabled], reason: "WeMacro 拍摄")
@@ -219,6 +218,7 @@ import UniformTypeIdentifiers
     func beginStepHold(_ direction: Int) {
         guard !busy, link.connected, !controlsBlocked else { return }
         do { try settings.validate() } catch { self.error = error.localizedDescription; return }
+        resetCaptureCompletion()
         let s = settings
         steppingHeld = true
         let repeatAfter = ProcessInfo.processInfo.systemUptime + 0.35
@@ -319,7 +319,12 @@ import UniformTypeIdentifiers
         guard p > 0 else { return }
         try await move(-direction * p, using: s); try await move(direction * p, using: s)
     }
-    func calibrate() { let s = settings; perform { [self] in try await calibrate(using: s) } }
+    func calibrate() {
+        guard !busy, link.connected else { return }
+        let s = settings
+        if s.backlash > 0 { resetCaptureCompletion() }
+        perform { [self] in try await calibrate(using:s) }
+    }
     func shutter() { perform { [self] in try link.send(RailProtocol.frame(0x04)); try await delay(settings.interval) } }
     func run() {
         guard !busy, canRun else { return }

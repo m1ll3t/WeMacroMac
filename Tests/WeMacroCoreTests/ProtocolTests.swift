@@ -293,3 +293,32 @@ import Foundation
     #expect(m.start == 0); #expect(m.end == nil); #expect(m.canRun)
     m.link.disconnect()
 }
+
+@Test @MainActor func completedCaptureKeepsEndpointsUntilManualMovement() async throws {
+    let m = RailModel(scanAtStartup:false,persistSettings:false)
+    m.kind = "模拟"; m.scan(); m.toggleConnection()
+    m.settings.microns = true; m.settings.step = 10
+    m.settings.settling = 0.01; m.settings.interval = 0.01; m.settings.shutters = 1
+    m.settings.compensate = false; m.settings.returnToStart = false; m.settings.beep = false
+    m.start = 0; m.end = 128
+    m.run()
+    for _ in 0..<300 { if !m.busy { break }; try await Task.sleep(for:.milliseconds(10)) }
+    #expect(m.captureFinished); #expect(m.start == 0); #expect(m.end == 128)
+    let shots = m.shotsTaken
+    m.controlsBlocked = true
+    let calculator = CalculatorModel()
+    calculator.input.overlap = 0.5
+    m.settings.interval = 0.02; m.settings.step = 20
+    #expect(m.start == 0); #expect(m.end == 128); #expect(m.captureFinished)
+    #expect(m.shotsTaken == shots)
+    m.controlsBlocked = false
+    m.shutter() // An extra shutter trigger is not a manual rail movement.
+    for _ in 0..<100 { if !m.busy { break }; try await Task.sleep(for:.milliseconds(10)) }
+    #expect(m.start == 0); #expect(m.end == 128); #expect(m.captureFinished)
+    m.beginStepHold(1); m.endStepHold()
+    #expect(m.start == nil); #expect(m.end == nil); #expect(!m.captureFinished)
+    #expect(m.completed == 0); #expect(m.shotsTaken == 0)
+    for _ in 0..<200 { if !m.busy { break }; try await Task.sleep(for:.milliseconds(10)) }
+    #expect(m.error == nil)
+    m.link.disconnect()
+}

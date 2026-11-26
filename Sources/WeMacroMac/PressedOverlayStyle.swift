@@ -3,23 +3,11 @@
 
 import SwiftUI
 
-private struct RailButtonActionKey: EnvironmentKey {
-    static let defaultValue: () -> Void = {}
-}
-extension EnvironmentValues {
-    var railButtonAction: () -> Void {
-        get { self[RailButtonActionKey.self] }
-        set { self[RailButtonActionKey.self] = newValue }
-    }
-}
-
 /// Uses the same 20% black press feedback for every action button.
 struct PressedOverlayStyle: ButtonStyle {
     var bordered = false
     var cornerRadius: CGFloat = 6
     var dimDisabled = true
-    var resetsCompletion = true
-    @Environment(\.railButtonAction) private var buttonAction
     @Environment(\.isEnabled) private var isEnabled
 
     func makeBody(configuration: Configuration) -> some View {
@@ -45,10 +33,5 @@ struct PressedOverlayStyle: ButtonStyle {
                 }
             }
             .opacity(isEnabled || !dimDisabled ? 1 : 0.45)
-            .onChange(of:configuration.isPressed) { _, pressed in
-                if !pressed && isEnabled && resetsCompletion {
-                    DispatchQueue.main.async { buttonAction() }
-                }
-            }
     }
 }

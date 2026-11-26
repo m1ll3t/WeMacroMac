@@ -8,7 +8,7 @@ public struct DepthInput: Equatable, Sendable {
     public var magnification: Double
     public var pixelSize: Double
     public var overlap: Double
-    public init(na: Double = 0.25, magnification: Double = 10, pixelSize: Double = 3.76, overlap: Double = 0.30) {
+    public init(na: Double = 0.25, magnification: Double = 10, pixelSize: Double = 3.76, overlap: Double = 0.20) {
         self.na = na; self.magnification = magnification; self.pixelSize = pixelSize; self.overlap = overlap
     }
 }
